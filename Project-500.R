@@ -2,10 +2,14 @@
 
 #----Read the file path
 library(readxl)
-path = "Desktop/Harrisburg/ANLY 500 - Prin of Analy/CustomerChurn.xlsx"
+library(psych)
+library(ggplot2)
+
+path = "C:/Users/ishan/Desktop/HU/ANLY-500-Project-master/ANLY-500-Project-master/CustomerChurn.xlsx"
 sheets = readxl::excel_sheets(path)
 size = length(sheets)
 excelData = list()
+
 for(i in seq_along(sheets)){
   sheet = sheets[i]
   excel = read_excel(path,sheet,skip =0)
@@ -24,6 +28,7 @@ describe(customerChurn)
 customerChurn_No = subset(customerChurn , Churn == "No")
 customerChurn_Yes = subset(customerChurn , Churn == "Yes")
 
+j = 1
 #------ Total number
 plot1 = ggplot(customerChurn, aes(x=customerChurn$PaymentMethod, y=customerChurn$MonthlyCharges , fill = PaymentMethod)) +
     geom_bar(stat = "identity") +
@@ -64,11 +69,11 @@ numeric_Phone = as.numeric(as.factor(customerChurn$PhoneService))
 numeric_OnlineSec = as.numeric(as.factor(customerChurn$OnlineSecurity))
 numeric_InternetServ = as.numeric(as.factor(customerChurn$InternetService))
 
-ggplot(customerChurn, aes(x = numeric_Phone, y = customerChurn$Churn)) + 
-  geom_bar(aes(fill =  PhoneService) ,stat = "identity") 
+ggplot(customerChurn, aes(x = numeric_Phone, fill = PhoneService)) + 
+  geom_bar(position = "dodge") 
 
 
-print(plot6)
+#print(plot6)
 
 print(plot1)
 print(plot2)
@@ -85,7 +90,7 @@ plotHistogram = function(x, title_, ...)
   
   x = x[!is.na(x)]
   
-  distNorm_MonthlyCharges = dnorm(xfit, mean = mean(x) , sd = sd(x))
+  distNorm_MonthlyCharges = dnorm(x, mean = mean(x) , sd = sd(x))
   
   h = hist(x, xlab = "Monthly charges", ylab = "Frequency", main = title_)
   
@@ -110,7 +115,30 @@ plotHistogram(customerChurn$TotalCharges, "Distribution of Total Charge")
 #------ Distribution of Total charges 
 plotHistogram(customerChurn_Yes$tenure, "Distribution of Tenure for poeple who Churn")
 
+## Which type of customer are more likely to churn
+# Contract type - Month to month, One year, two year
+# Conclusion 4 - MONTH TO MONTH are more likely to churn
+
+x = customerChurn$Contract
+x = x [!is.na(x)]
+ggplot(customerChurn , aes(x = x, y = customerChurn$Churn, fill = Churn)) +geom_bar( stat = "identity")
+
+## Conclusion 5- Which type of people are likely to churn?
+## PhoneService, InternetService, OnlineBackup etc..
+## Infer from Pie charts?
+## May be we need to remove the "No internet service" for better percentage analysis
+pie(table(customerChurn_No$InternetService))
+pie(table(customerChurn_Yes$InternetService))
+
+pie(table(customerChurn_No$PhoneService))
+pie(table(customerChurn_Yes$PhoneService))
+
+pie(table(customerChurn_No$OnlineBackup))
+pie(table(customerChurn_Yes$OnlineBackup))
+
+pie(table(customerChurn_No$OnlineSecurity))
+pie(table(customerChurn_Yes$OnlineSecurity))
 
 
-###----- Find what is the average monthly cost above which people will think to churn
+
 
