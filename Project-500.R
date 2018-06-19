@@ -5,7 +5,9 @@ library(readxl)
 library(psych)
 library(ggplot2)
 
-path = "C:/Users/ishan/Desktop/HU/ANLY-500-Project-master/ANLY-500-Project-master/CustomerChurn.xlsx"
+#path = "C:/Users/ishan/Desktop/HU/ANLY-500-Project-master/ANLY-500-Project-master/CustomerChurn.xlsx"
+path = "Desktop/Harrisburg/ANLY 500 - Prin of Analy/CustomerChurn.xlsx"
+
 sheets = readxl::excel_sheets(path)
 size = length(sheets)
 excelData = list()
@@ -20,19 +22,41 @@ for(i in seq_along(sheets)){
 
 customerChurn = excelData[[1]]
 
-#----- Basic descriptive analysis
-summary(customerChurn)
-describe(customerChurn)
+
 
 #------ Begin some data filtering and analysis
 customerChurn_No = subset(customerChurn , Churn == "No")
 customerChurn_Yes = subset(customerChurn , Churn == "Yes")
 
+#----- Basic descriptive analysis
+#------ Can draw a lot of conclusions from these graphs and distributiuons!!!
+summary(customerChurn)
+describe(customerChurn)
+library(miscset)
+ggplotGrid(ncol = 2,
+           lapply(c("PhoneService", "InternetService", "OnlineSecurity", "OnlineBackup"),
+                  function(col) {
+                    ggplot(customerChurn, aes_string(col)) + geom_bar() + coord_flip()
+                  }))
+
+
+#----- Basic descriptive analysis
+ggplotGrid(ncol = 2,
+           lapply(c("PhoneService", "InternetService", "OnlineSecurity", "OnlineBackup"),
+                  function(col) {
+                    ggplot(customerChurn, aes_string(col)) + geom_bar() + coord_flip()
+                  }))
+
+ggplotGrid(ncol = 2,
+           lapply(c("PhoneService", "InternetService", "OnlineSecurity", "OnlineBackup"),
+                  function(col) {
+                    ggplot(customerChurn, aes_string(col)) + geom_bar() + coord_flip()
+                  }))
 j = 1
 #------ Total number
 plot1 = ggplot(customerChurn, aes(x=customerChurn$PaymentMethod, y=customerChurn$MonthlyCharges , fill = PaymentMethod)) +
-    geom_bar(stat = "identity") +
-    ggtitle(sheets[j])
+  geom_bar(stat = "identity") +
+  ggtitle(sheets[j])
 
 #------- When customer churn is "No"
 plot2 = ggplot(customerChurn_No, aes(x=customerChurn_No$PaymentMethod, y=customerChurn_No$MonthlyCharges , fill = PaymentMethod)) +
@@ -43,7 +67,7 @@ plot2 = ggplot(customerChurn_No, aes(x=customerChurn_No$PaymentMethod, y=custome
 
 #----- Conclusion one - Maybe people who churn use electronic checks for monthly payments a lot
 plot3 = ggplot(customerChurn_Yes, aes(x=customerChurn_Yes$PaymentMethod, y=customerChurn_Yes$MonthlyCharges , fill = PaymentMethod)) +
-    geom_bar(stat = "identity") +
+  geom_bar(stat = "identity") +
   ggtitle(sheets[j])
 
 
@@ -51,10 +75,10 @@ plot3 = ggplot(customerChurn_Yes, aes(x=customerChurn_Yes$PaymentMethod, y=custo
 #------- Senior Citizen and Churn or not?
 #--------Conclusion two- Maybe poeple who churn are more likely to be not senior citizen
 plot4 =ggplot(customerChurn, aes(x = customerChurn$Churn, y = customerChurn$SeniorCitizen , fill = Churn)) + 
-    geom_bar(stat = "identity") 
+  geom_bar(stat = "identity") 
 
 #------- Plot in a PIE CHART ????-- Need to plot Stacked bar chart   pieChart = plotChurn_Senior + coor
-  
+
 
 #------ Conculusion three - Male are more likely to churn than female 
 plot5 = ggplot(customerChurn_Yes, aes(x = customerChurn_Yes$Churn, y = customerChurn_Yes$gender , fill = gender)) + 
@@ -108,12 +132,16 @@ plotHistogram = function(x, title_, ...)
 
 #------ Distribution of monthly charges 
 plotHistogram(customerChurn$MonthlyCharges, "Distribution of Monthly Charge")
- 
+
 #------ Distribution of Total charges 
 plotHistogram(customerChurn$TotalCharges, "Distribution of Total Charge")
 
 #------ Distribution of Total charges 
 plotHistogram(customerChurn_Yes$tenure, "Distribution of Tenure for poeple who Churn")
+
+
+#----- Conclusion : People who avg monthly bill is higher than 55 are more likely to Churn
+ggplot(customerChurn , aes(x = Churn , y =  customerChurn$MonthlyCharges)) + geom_boxplot() + coord_flip()
 
 ## Which type of customer are more likely to churn
 # Contract type - Month to month, One year, two year
