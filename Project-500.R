@@ -37,21 +37,21 @@ ggplotGrid(ncol = 2,
            lapply(c("PhoneService", "InternetService", "OnlineSecurity", "OnlineBackup"),
                   function(col) {
                     ggplot(customerChurn, aes_string(col)) + geom_bar() + coord_flip()
-                  }))
+                  })) + ggtitle("All Customers")
 
 
 #----- Basic descriptive analysis
 ggplotGrid(ncol = 2,
            lapply(c("PhoneService", "InternetService", "OnlineSecurity", "OnlineBackup"),
                   function(col) {
-                    ggplot(customerChurn, aes_string(col)) + geom_bar() + coord_flip()
-                  }))
+                    ggplot(customerChurn_No, aes_string(col)) + geom_bar() + coord_flip()
+                  })) + ggtitle("Customer Not Churning")
 
 ggplotGrid(ncol = 2,
            lapply(c("PhoneService", "InternetService", "OnlineSecurity", "OnlineBackup"),
                   function(col) {
-                    ggplot(customerChurn, aes_string(col)) + geom_bar() + coord_flip()
-                  }))
+                    ggplot(customerChurn_Yes, aes_string(col)) + geom_bar() + coord_flip()
+                  })) + ggtitle("Customer Churning")
 j = 1
 #------ Total number
 plot1 = ggplot(customerChurn, aes(x=customerChurn$PaymentMethod, y=customerChurn$MonthlyCharges , fill = PaymentMethod)) +
@@ -167,6 +167,21 @@ pie(table(customerChurn_Yes$OnlineBackup))
 pie(table(customerChurn_No$OnlineSecurity))
 pie(table(customerChurn_Yes$OnlineSecurity))
 
+
+###### Ploting tablular relations between categorical data
+
+### TODO: add proper legends and axis and colors
+plotTable = function(t)
+{
+  barplot(prop.table(t), beside = T)
+  barplot(t, beside =T)
+}
+
+t  = table(customerChurn$InternetService, customerChurn$Churn)
+t  = table(customerChurn$InternetService, customerChurn$SeniorCitizen)
+t  = table(customerChurn$TechSupport, customerChurn$SeniorCitizen)
+
+plotTable(t)
 
 
 
