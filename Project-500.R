@@ -1,9 +1,15 @@
 #Project
-
+#install.packages("partykit")
+#install.packages("caret")
+#install.packages("corrplot")
 #----Read the file path
 library(readxl)
 library(psych)
 library(ggplot2)
+
+library(corrplot)
+library(caret)
+library(partykit)
 
 #path = "C:/Users/ishan/Desktop/HU/ANLY-500-Project-master/ANLY-500-Project-master/CustomerChurn.xlsx"
 path = "Desktop/Harrisburg/ANLY 500 - Prin of Analy/CustomerChurn.xlsx"
@@ -22,8 +28,13 @@ for(i in seq_along(sheets)){
 
 customerChurn = excelData[[1]]
 
+x = customerChurn$MonthlyCharges
+customerChurn$MonthlyCharges =  x [!is.na(x)]
+length(customer_Montly) 
+length(customer_TotalCharges)
 
-
+sapply(customerChurn, function(x) sum(is.na(x)))
+customerChurn = customerChurn[complete.cases(customerChurn), ]
 #------ Begin some data filtering and analysis
 customerChurn_No = subset(customerChurn , Churn == "No")
 customerChurn_Yes = subset(customerChurn , Churn == "Yes")
@@ -183,5 +194,35 @@ t  = table(customerChurn$TechSupport, customerChurn$SeniorCitizen)
 
 plotTable(t)
 
+
+################ BEGIN REGRESSION OR NUMERICAL ANALYSIS TO FIND KEY FACTORS FOR CUSTOMER CHR
+#### correlation between contract and tenure
+customerChurn_numeric = as.data.frame(sapply(customerChurn , function(x) as.numeric(as.factor(as.character(x)))))
+
+str(customerChurn_numeric)
+summary(customerChurn_numeric)
+
+
+corr = cor(customerChurn_numeric[,2:16])
+corrplot(corr, method = "pie" , type = "lower")
+
+#### correlationg between monthly and total cost
+### NOTE: total has some NA values and needs some processing and cleaning up
+
+corr = cor(customerChurn [,19:20])
+corrplot(corr, method = "pie")
+
+#PLOT DECISION TREE DIAGRAM
+tree = ctree(Churn~ Contract + tenure, customerChurn_numeric)
+plot(tree)
+
+tree = ctree(Churn~ MonthlyCharges , customerChurn_numeric)
+plot(tree)
+
+tree = ctree(Churn~ TotalCharges , customerChurn_numeric)
+plot(tree)
+
+tree = ctree(Churn~ MonthlyCharges + TotalCharges , customerChurn_numeric)
+plot(tree)
 
 
